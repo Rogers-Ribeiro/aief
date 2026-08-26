@@ -1,0 +1,66 @@
+# Stack Profile — node
+#
+# Binds universal Foundation intents to commands this ecosystem can actually
+# run. Every capability declared supported:true has a real command behind it;
+# every gap is declared rather than left silent (AIEF-CORE-013, §40.1).
+name: node
+version: 0.1.0
+
+capabilities:
+  format:
+    supported: true
+    binding:
+      command: npm run format:check
+      failure: nonzero exit means unformatted files
+  lint:
+    supported: true
+    binding:
+      command: npm run lint
+      failure: nonzero exit means lint errors
+  test:
+    supported: true
+    binding:
+      command: npm test
+      failure: nonzero exit means failing tests
+  dependency_audit:
+    supported: true
+    binding:
+      command: npm audit --audit-level=high
+      failure: nonzero exit means a known high-severity advisory
+  typecheck:
+    # Plain JavaScript. A TypeScript project selects a profile that binds this.
+    supported: false
+  architecture_check:
+    # No boundary checker is wired yet; the check itself is AIEF-002.
+    # Declared unsupported so that any rule depending on it surfaces as an
+    # orphan rule instead of silently going unenforced.
+    supported: false
+  contract_check:
+    supported: false
+  secret_scan:
+    # No scanner is installed. Declared rather than assumed, which keeps
+    # AIEF-SEC-001 advisory instead of claiming a protection nothing provides.
+    # Binding one is AIEF-002.
+    supported: false
+
+signals:
+  large_file_loc: 400
+  large_diff_loc: 800
+  review_attention_loc: 700
+
+# Rule overlays (§8.5, §11.3).
+#
+# The Foundation states these intents but leaves them advisory, because it
+# cannot know which stack a project selects. This profile binds four of them,
+# so this is the layer entitled to raise the mode. The capabilities declared
+# unsupported above are deliberately absent here: raising a rule with no
+# binding behind it is the orphan-rule defect (§12.1).
+rules:
+  - id: AIEF-QUAL-013 # bound by capability: format
+    mode: enforced
+  - id: AIEF-QUAL-014 # bound by capability: lint
+    mode: enforced
+  - id: AIEF-TEST-002 # bound by capability: test
+    mode: enforced
+  - id: AIEF-SEC-006 # bound by capability: dependency_audit
+    mode: enforced

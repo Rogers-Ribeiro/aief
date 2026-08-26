@@ -1,0 +1,108 @@
+# AIEF workflow rules — classification, evidence, done, adoption.
+#
+# Every rule here is advisory today, and that is a statement of fact rather
+# than a lowering of ambition: nothing yet verifies them deterministically.
+# Marking them "enforced" would claim protection that does not exist, which
+# is precisely the orphan-rule defect §12.1 exists to catch. They become
+# enforced when a binding lands, not when they feel important enough.
+namespace: AIEF-FLOW
+foundation_version: '0.3.1'
+
+rules:
+  - id: AIEF-FLOW-001
+    intent: 'Every change is classified by Change Level and Risk Flags before implementation begins.'
+    default_mode: advisory
+    enforcement_category: classification
+    conformance: core
+    section: '§20.1'
+
+  - id: AIEF-FLOW-002
+    intent: 'An AI agent may reclassify a change upward but never downward; a human lowering it records the justification.'
+    default_mode: advisory
+    enforcement_category: classification
+    conformance: core
+    section: '§20.2'
+
+  - id: AIEF-FLOW-003
+    intent: 'Category floors apply regardless of diff size: public contract and governance at least L2, any active risk flag at least L1, irreversible is L4.'
+    default_mode: advisory
+    enforcement_category: classification
+    conformance: core
+    section: '§20.3'
+
+  - id: AIEF-FLOW-004
+    intent: 'An AI agent does not authorize an L4 change.'
+    default_mode: advisory
+    enforcement_category: classification
+    conformance: core
+    section: '§19'
+
+  - id: AIEF-FLOW-005
+    intent: 'Completion is reported with the command executed, its exit status and an excerpt of its real output.'
+    default_mode: advisory
+    enforcement_category: verification
+    conformance: core
+    section: '§33'
+
+  - id: AIEF-FLOW-006
+    intent: 'A check that could not be run is disclosed with its reason; silence about an unrun check is a false completion report.'
+    default_mode: advisory
+    enforcement_category: verification
+    conformance: core
+    section: '§33'
+
+  - id: AIEF-FLOW-007
+    intent: 'Review is performed by someone or something other than the implementer.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: core
+    section: '§24'
+
+  - id: AIEF-FLOW-008
+    intent: 'An ADR records a decision that materially constrains future implementation choices, with a revisit trigger when the decision is temporary or scale-dependent.'
+    default_mode: advisory
+    enforcement_category: documentation
+    conformance: core
+    section: '§26'
+
+  - id: AIEF-FLOW-009
+    intent: 'Adoption into an existing repository extracts the conventions already in use before adding new ones.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: core
+    section: '§45'
+
+  - id: AIEF-FLOW-010
+    intent: 'Existing debt may be baselined; a violation identity absent from the baseline fails the check.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: full
+    section: '§46'
+
+  - id: AIEF-FLOW-011
+    intent: 'Adding a violation to the baseline, including upward regeneration, requires a waiver.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: full
+    section: '§46'
+
+  - id: AIEF-FLOW-012
+    intent: 'Governance changes are shown before they are written, with their layer and affected rule identities.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: core
+    section: '§38'
+
+  - id: AIEF-FLOW-013
+    intent: 'A rule is promoted only with named evidence or an explicit grounded rationale; speculative rules are prohibited.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: core
+    section: '§30.2'
+
+  - id: AIEF-FLOW-014
+    intent: 'A retired rule is removed from active context rather than left in place.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: core
+    section: '§30.6'

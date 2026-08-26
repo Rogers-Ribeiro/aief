@@ -1,0 +1,141 @@
+# AIEF core governance rules — layering, allocation, conformance.
+# Addressable projection of AIEF-000. The prose is normative (ADR-0002).
+namespace: AIEF-CORE
+foundation_version: '0.3.1'
+
+rules:
+  - id: AIEF-CORE-001
+    intent: 'Exactly three knowledge layers exist: Foundation, Stack Profile, Project Profile.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: core
+    section: '§5'
+
+  - id: AIEF-CORE-002
+    intent: 'Provider files are projections of the composed configuration, never independent policy sources.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: core
+    section: '§6'
+
+  - id: AIEF-CORE-003
+    intent: 'Every new governance artifact passes the allocation test before being added.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: core
+    section: '§7'
+
+  - id: AIEF-CORE-004
+    intent: 'A rule spanning layers is decomposed into intent, binding and parameters.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: core
+    section: '§8'
+
+  - id: AIEF-CORE-005
+    intent: 'A rule that is enforced, waived, referenced or baselined has a stable identity.'
+    default_mode: enforced
+    enforcement_category: governance
+    conformance: core
+    section: '§10'
+
+  - id: AIEF-CORE-006
+    intent: 'A detected contradiction with no active waiver fails rather than warns.'
+    default_mode: enforced
+    enforcement_category: governance
+    conformance: full
+    section: '§11.2'
+
+  - id: AIEF-CORE-007
+    intent: 'An enforced rule whose binding does not exist is an orphan rule and is a defect.'
+    default_mode: enforced
+    enforcement_category: governance
+    conformance: full
+    section: '§12.1'
+
+  - id: AIEF-CORE-008
+    intent: 'A binding that no active rule references is orphan enforcement and is reported.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: full
+    section: '§12.2'
+
+  - id: AIEF-CORE-009
+    intent: 'Every deviation is expressed as a visible, scoped, justified waiver.'
+    default_mode: enforced
+    enforcement_category: governance
+    conformance: core
+    section: '§31'
+
+  - id: AIEF-CORE-010
+    intent: 'An expired waiver is a governance failure, not a grace period.'
+    default_mode: enforced
+    enforcement_category: governance
+    conformance: core
+    section: '§31.5'
+
+  - id: AIEF-CORE-011
+    intent: 'The normative Foundation contains no stack, project or provider specific detail.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: core
+    section: '§58'
+
+  - id: AIEF-CORE-012
+    intent: "The repository is buildable, testable and governable without any developer's personal configuration."
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: core
+    section: '§18.4'
+
+  - id: AIEF-CORE-013
+    intent: 'A capability the ecosystem cannot verify is declared unsupported rather than left silent.'
+    default_mode: enforced
+    enforcement_category: governance
+    conformance: core
+    section: '§40.1'
+
+  - id: AIEF-CORE-014
+    intent: 'The Foundation is referenced by version, never vendored into a project repository.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: core
+    section: '§57'
+
+  - id: AIEF-CORE-015
+    intent: 'An implementation satisfies every requirement of the conformance level it declares.'
+    default_mode: enforced
+    enforcement_category: governance
+    conformance: core
+    section: '§4.3'
+
+  # The three below are declared advisory because their checks are not built
+  # yet (AIEF-002). They exist so the requirement is addressable — a conformance
+  # requirement no rule covers cannot be waived, bound or audited.
+  - id: AIEF-CORE-016
+    intent: 'Layer boundaries are verified: no project or stack detail in the Foundation, no project detail in a Stack Profile, no upward leakage from a Project Profile.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: full
+    section: '§55'
+
+  - id: AIEF-CORE-017
+    intent: 'The resolved composition is inspectable, reporting for every rule its origin, scope, mode, binding and any active waiver.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: full
+    section: '§9'
+
+  - id: AIEF-CORE-018
+    intent: 'A configuration health check runs on a defined cadence and reports duplication, contradiction, staleness, orphans and unmet conformance claims.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: full
+    section: '§48'
+
+  - id: AIEF-CORE-019
+    intent: 'A Foundation rule whose enforcement depends on a stack tool defaults to advisory; only a layer that supplies the binding raises it to enforced.'
+    default_mode: enforced
+    enforcement_category: governance
+    conformance: core
+    section: '§8.5'

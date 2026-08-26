@@ -1,0 +1,43 @@
+{
+  "name": "aief",
+  "version": "0.1.0",
+  "description": "AI Engineering Foundation - provider-neutral engineering governance for software built with AI coding agents",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "aief": "./src/cli/index.js"
+  },
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src/",
+    "foundation/",
+    "stacks/",
+    "providers/",
+    "schemas/",
+    "templates/"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "lint": "eslint src test scripts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "compose": "node src/cli/index.js compose",
+    "verify": "npm run format:check && npm run lint && npm run parity && npm run schemas && npm test && npm run compose",
+    "parity": "node scripts/check-parity.js",
+    "schemas": "node scripts/schemas.js",
+    "schemas:write": "node scripts/schemas.js --write"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "yaml": "^2.6.1"
+  },
+  "devDependencies": {
+    "eslint": "^9.15.0",
+    "prettier": "^3.4.1"
+  }
+}

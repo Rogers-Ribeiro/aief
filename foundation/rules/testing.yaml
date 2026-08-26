@@ -1,0 +1,62 @@
+# AIEF testing intent — frameworks belong to Stack Profiles,
+# thresholds to Project Profiles.
+namespace: AIEF-TEST
+foundation_version: '0.3.1'
+
+rules:
+  - id: AIEF-TEST-001
+    intent: 'Tests target behavior, not implementation details.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§35'
+
+  - id: AIEF-TEST-002
+    intent: 'A bug fix carries regression coverage, written failing first.'
+    # Tool-bound: advisory until a Stack Profile binds the capability (§8.5).
+    default_mode: advisory
+    enforcement_category: tests
+    conformance: core
+    section: '§35'
+
+  - id: AIEF-TEST-003
+    intent: 'Critical boundaries carry integration-level evidence when practical.'
+    default_mode: advisory
+    enforcement_category: tests
+    conformance: core
+    section: '§35'
+
+  - id: AIEF-TEST-004
+    intent: 'External contracts carry contract verification when applicable.'
+    default_mode: advisory
+    enforcement_category: contracts
+    conformance: core
+    section: '§35'
+
+  - id: AIEF-TEST-005
+    intent: 'No test merely restates a statically defined constant.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§35'
+
+  - id: AIEF-TEST-006
+    intent: 'No negative test is written for logic that was removed.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§35'
+
+  - id: AIEF-TEST-007
+    intent: 'Integration tests use real dependencies rather than heavy mocking.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§35'
+
+  - id: AIEF-TEST-008
+    intent: 'Test doubles are chosen to suit the layer under test.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§35'

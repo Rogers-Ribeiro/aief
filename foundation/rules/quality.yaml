@@ -1,0 +1,104 @@
+# AIEF quality rules — anti-vibe-debt, context budget, engineering signals.
+namespace: AIEF-QUAL
+foundation_version: '0.3.1'
+
+rules:
+  - id: AIEF-QUAL-001
+    intent: 'Search for an existing equivalent before creating a new abstraction, service, helper, type or configuration concept.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§28.1'
+
+  - id: AIEF-QUAL-002
+    intent: 'No abstraction is created for a hypothetical future consumer.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§28.2'
+
+  - id: AIEF-QUAL-003
+    intent: 'A duplicate concept is never introduced to avoid repairing an inconvenient existing one.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§28.3'
+
+  - id: AIEF-QUAL-004
+    intent: 'Unrelated improvements are reported, never implemented silently. Minimal coherent diff.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§28.4'
+
+  - id: AIEF-QUAL-005
+    intent: 'Existing repository conventions outrank generic preferences unless they violate an explicit active rule.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§28.5'
+
+  - id: AIEF-QUAL-006
+    intent: 'Comments preserve intent, constraints and surprises; they do not narrate obvious code.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§28.6'
+
+  - id: AIEF-QUAL-007
+    intent: 'No unused directory, rule, skill, agent, abstraction or configuration file is created for later.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§29'
+
+  - id: AIEF-QUAL-008
+    intent: 'Information derivable from the repository is not duplicated into permanent agent context.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§13'
+
+  - id: AIEF-QUAL-009
+    intent: 'A narrower rule specializes a broader one rather than duplicating it.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: core
+    section: '§14'
+
+  - id: AIEF-QUAL-010
+    intent: 'An unfamiliar external API is verified against the installed version and existing usage; APIs are never invented from memory.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§34'
+
+  - id: AIEF-QUAL-011
+    intent: 'Every engineering signal used by a project has a numeric threshold defined by a Stack or Project Profile.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: core
+    section: '§50'
+
+  - id: AIEF-QUAL-013
+    intent: "Source conforms to the ecosystem's formatter, so that diffs carry meaning rather than style noise."
+    # Tool-bound: advisory until a Stack Profile binds the capability (§8.5).
+    default_mode: advisory
+    enforcement_category: formatting
+    conformance: core
+    section: '§32'
+
+  - id: AIEF-QUAL-014
+    intent: "Source passes the ecosystem's linter."
+    # Tool-bound: advisory until a Stack Profile binds the capability (§8.5).
+    default_mode: advisory
+    enforcement_category: lint
+    conformance: core
+    section: '§32'
+
+  - id: AIEF-QUAL-012
+    intent: 'Engineering signals produce warnings and review attention, never hard blocks.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: core
+    section: '§50'

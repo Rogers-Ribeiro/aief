@@ -1,0 +1,18 @@
+{
+  "$id": "https://aief.dev/schemas/waiver-file.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "waivers": {
+      "items": {
+        "$ref": "https://aief.dev/schemas/waiver.schema.json"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "waivers"
+  ],
+  "title": "AIEF Waiver File",
+  "type": "object"
+}

@@ -1,0 +1,35 @@
+name: Governance change
+description: Propose a change to Foundation, Stack/Profile contracts, or governance behavior
+title: '[Governance] '
+labels: ['governance']
+body:
+  - type: dropdown
+    id: level
+    attributes:
+      label: Proposed Change Level
+      options:
+        - L2
+        - L3
+        - L4
+    validations:
+      required: true
+  - type: textarea
+    id: layer
+    attributes:
+      label: Allocation
+      description: Foundation, Stack Profile, Project Profile, Provider Adapter, or tooling?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence or explicit rationale
+      description: Implementation finding, recurring friction, documented risk, invariant, contract, regulation, or external constraint.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+    validations:
+      required: true

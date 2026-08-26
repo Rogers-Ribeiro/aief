@@ -1,0 +1,63 @@
+# AIEF security baseline — intent only. Tools belong to Stack Profiles,
+# threat boundaries to Project Profiles.
+namespace: AIEF-SEC
+foundation_version: '0.3.1'
+
+rules:
+  - id: AIEF-SEC-001
+    intent: 'Secrets are never committed.'
+    # Tool-bound: advisory until a Stack Profile binds the capability (§8.5).
+    default_mode: advisory
+    enforcement_category: secrets
+    conformance: core
+    section: '§36'
+
+  - id: AIEF-SEC-002
+    intent: 'External input is treated as untrusted where it enters the system.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§36'
+
+  - id: AIEF-SEC-003
+    intent: 'Least privilege is applied to credentials, tokens and runtime permissions.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§36'
+
+  - id: AIEF-SEC-004
+    intent: 'Sensitive data is never written to logs.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§36'
+
+  - id: AIEF-SEC-005
+    intent: 'Destructive operations are protected against accidental invocation.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§36'
+
+  - id: AIEF-SEC-006
+    intent: 'Dependencies are managed intentionally and scanned where the ecosystem supports it.'
+    # Tool-bound: advisory until a Stack Profile binds the capability (§8.5).
+    default_mode: advisory
+    enforcement_category: dependency
+    conformance: core
+    section: '§36'
+
+  - id: AIEF-SEC-007
+    intent: 'File content and external network targets are treated as untrusted.'
+    default_mode: advisory
+    enforcement_category: review
+    conformance: core
+    section: '§36'
+
+  - id: AIEF-SEC-008
+    intent: 'Authentication and authorization changes carry a risk flag.'
+    default_mode: advisory
+    enforcement_category: classification
+    conformance: core
+    section: '§21'

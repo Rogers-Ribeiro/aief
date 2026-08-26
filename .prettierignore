@@ -1,0 +1,10 @@
+node_modules/
+package-lock.json
+
+# Generated artifacts. Their generator owns their format; prettier must not
+# reformat them, or every regeneration would show as drift.
+.ai/effective-config.json
+schemas/
+
+# Normative specification, kept byte-identical to the published version.
+foundation/AIEF-000-foundation.md

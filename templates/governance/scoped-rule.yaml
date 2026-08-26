@@ -1,0 +1,14 @@
+id: '<stable-rule-id>'
+status: active
+mode: advisory
+owner: project
+
+scope:
+  type: paths
+  include:
+    - '<pattern>'
+  exclude: []
+
+intent: '<what must remain true>'
+binding: null
+rationale: '<evidence or explicit rationale>'

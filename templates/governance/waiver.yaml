@@ -1,0 +1,8 @@
+rule_id: '<stable-rule-id>'
+scope: '<limited scope>'
+reason: '<why the deviation is required>'
+owner: '<responsible owner>'
+created_at: '<YYYY-MM-DD>'
+expires_at: null
+tracking_ref: null
+risk: null

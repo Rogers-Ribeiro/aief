@@ -1,0 +1,28 @@
+{
+  "$id": "https://aief.dev/schemas/rule-file.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "foundation_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "namespace": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "rules": {
+      "items": {
+        "$ref": "https://aief.dev/schemas/rule.schema.json"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "namespace",
+    "foundation_version",
+    "rules"
+  ],
+  "title": "AIEF Rule File",
+  "type": "object"
+}

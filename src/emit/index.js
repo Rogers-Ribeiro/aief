@@ -1,0 +1,110 @@
+/**
+ * Materialization of the Effective Configuration (§9) and human-readable
+ * reporting for the CLI.
+ *
+ * Determinism is a requirement, not a nicety (AIEF-001 AC12): a composition
+ * that reorders between runs produces noise in review, and noise in review is
+ * how a real change slips through.
+ */
+import { writeFileSync, mkdirSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+
+export const EFFECTIVE_CONFIG_PATH = join('.ai', 'effective-config.json');
+
+/** JSON with recursively sorted keys, so output depends on content alone. */
+export function stableStringify(value, indent = 2) {
+  const sort = (v) => {
+    if (Array.isArray(v)) return v.map(sort);
+    if (v && typeof v === 'object') {
+      return Object.fromEntries(
+        Object.keys(v)
+          .sort()
+          .map((k) => [k, sort(v[k])]),
+      );
+    }
+    return v;
+  };
+  return `${JSON.stringify(sort(value), null, indent)}\n`;
+}
+
+export function toEffectiveConfig(result) {
+  return {
+    generated_by: 'aief compose',
+    warning: 'Generated artifact. Do not edit by hand — edit the source layers instead.',
+    meta: result.meta,
+    rules: result.rules.map((r) => ({
+      id: r.id,
+      intent: r.intent,
+      mode: r.mode,
+      enforcement_category: r.enforcement_category,
+      conformance: r.conformance,
+      section: r.section,
+      origin: r.origin,
+      overrides: r.overrides ?? [],
+      binding: r.binding ?? null,
+      waiver: r.waiver ?? null,
+      scope: r.scope ?? null,
+      parameters: r.parameters ?? null,
+    })),
+  };
+}
+
+export function writeEffectiveConfig(cwd, result) {
+  const file = join(cwd, EFFECTIVE_CONFIG_PATH);
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, stableStringify(toEffectiveConfig(result)), 'utf8');
+  return file;
+}
+
+const MODE_MARK = { enforced: '!', advisory: '~', off: '-' };
+
+export function renderReport(result, { verbose = false } = {}) {
+  const lines = [];
+  const m = result.meta;
+
+  lines.push(
+    `foundation ${m.foundation_version ?? '(unversioned)'} via ${m.foundation_strategy}` +
+      `  ·  conformance ${m.conformance}` +
+      `  ·  stacks ${m.stacks.length ? m.stacks.join(', ') : '(none)'}`,
+  );
+  lines.push(
+    `${m.counts.rules} rules  ·  ${m.counts.enforced} enforced  ·  ` +
+      `${m.counts.advisory} advisory  ·  ${m.counts.off} off  ·  ${m.counts.waived} waived`,
+  );
+
+  if (verbose) {
+    lines.push('');
+    for (const r of result.rules) {
+      const bind =
+        r.binding?.kind === 'stack'
+          ? `${r.binding.stack}:${r.binding.capability}`
+          : r.binding?.kind === 'engine'
+            ? 'engine'
+            : '';
+      const trail = r.overrides?.length
+        ? `  <- ${r.overrides.map((o) => `${o.layer}:${o.to}`).join(' <- ')}`
+        : '';
+      const waived = r.waiver ? '  [waived]' : '';
+      lines.push(
+        `  ${MODE_MARK[r.mode] ?? '?'} ${r.id.padEnd(16)} ${(bind || '—').padEnd(22)}` +
+          `${r.origin.layer}${trail}${waived}`,
+      );
+    }
+  }
+
+  if (result.warnings.length) {
+    lines.push('');
+    for (const w of result.warnings) lines.push(`  warning: ${w}`);
+  }
+
+  if (result.failures.length) {
+    lines.push('');
+    for (const f of result.failures) {
+      lines.push(`  FAIL [${f.code}] ${f.message}`);
+    }
+    lines.push('');
+    lines.push(`${result.failures.length} governance failure(s).`);
+  }
+
+  return lines.join('\n');
+}

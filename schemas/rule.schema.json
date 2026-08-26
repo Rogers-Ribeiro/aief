@@ -1,0 +1,99 @@
+{
+  "$id": "https://aief.dev/schemas/rule.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "An addressable rule intent from a Foundation sidecar file (ADR-0002). The normative explanation lives in the specification section this entry cites.",
+  "properties": {
+    "conformance": {
+      "enum": [
+        "core",
+        "full"
+      ]
+    },
+    "default_mode": {
+      "description": "Enforced means something actually enforces it. Otherwise say advisory.",
+      "enum": [
+        "enforced",
+        "advisory",
+        "off"
+      ]
+    },
+    "enforcement_category": {
+      "description": "Maps the rule to a stack capability, the engine, or human judgement.",
+      "minLength": 1,
+      "type": "string"
+    },
+    "id": {
+      "description": "Stable identity. Waivers and audits address this.",
+      "minLength": 1,
+      "pattern": "^[A-Z][A-Z0-9]*(-[A-Z0-9]+)*-\\d{3,}$",
+      "type": "string"
+    },
+    "intent": {
+      "description": "What must remain true. Provider-neutral and stack-neutral.",
+      "minLength": 1,
+      "type": "string"
+    },
+    "rationale": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "scope": {
+      "description": "Where the rule applies. Absent means repository-wide.",
+      "oneOf": [
+        {
+          "const": "global"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "exclude": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "include": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": {
+              "enum": [
+                "paths",
+                "module",
+                "component",
+                "directory",
+                "language",
+                "file-type",
+                "repository-area"
+              ]
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "section": {
+      "description": "The specification section this rule projects, e.g. \"§12.1\".",
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "intent",
+    "default_mode",
+    "enforcement_category",
+    "conformance",
+    "section"
+  ],
+  "title": "AIEF Rule",
+  "type": "object"
+}

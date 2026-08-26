@@ -1,0 +1,151 @@
+{
+  "$id": "https://aief.dev/schemas/stack-profile.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Binds universal Foundation intents to commands an ecosystem can run.",
+  "properties": {
+    "capabilities": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "if": {
+          "properties": {
+            "supported": {
+              "const": true
+            }
+          },
+          "required": [
+            "supported"
+          ]
+        },
+        "properties": {
+          "binding": {
+            "additionalProperties": false,
+            "properties": {
+              "command": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "failure": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "command"
+            ],
+            "type": "object"
+          },
+          "supported": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "supported"
+        ],
+        "then": {
+          "required": [
+            "binding"
+          ]
+        },
+        "type": "object"
+      },
+      "propertyNames": {
+        "enum": [
+          "format",
+          "lint",
+          "typecheck",
+          "test",
+          "architecture_check",
+          "contract_check",
+          "secret_scan",
+          "dependency_audit"
+        ]
+      },
+      "type": "object"
+    },
+    "name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "rules": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "pattern": "^[A-Z][A-Z0-9]*(-[A-Z0-9]+)*-\\d{3,}$",
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "enforced",
+              "advisory",
+              "off"
+            ]
+          },
+          "scope": {
+            "description": "Where the rule applies. Absent means repository-wide.",
+            "oneOf": [
+              {
+                "const": "global"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "exclude": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "include": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "type": {
+                    "enum": [
+                      "paths",
+                      "module",
+                      "component",
+                      "directory",
+                      "language",
+                      "file-type",
+                      "repository-area"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ],
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "signals": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "type": "object"
+    },
+    "version": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "version",
+    "capabilities"
+  ],
+  "title": "AIEF Stack Profile",
+  "type": "object"
+}

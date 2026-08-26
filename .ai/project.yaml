@@ -1,0 +1,35 @@
+# Project Profile — AIEF governing itself.
+#
+# AIEF-000 §44: a working example is worth more than prose describing an
+# untested pattern. If the framework cannot govern its own repository, the
+# claim that it governs anything is untested.
+project:
+  id: aief
+  name: AI Engineering Foundation
+
+foundation:
+  version: '0.3.1'
+  # "core" and not "full" because this engine does not yet implement the
+  # health check, layer-boundary tests or mechanical baseline monotonicity.
+  # Declaring "full" would fail composition under AIEF-CORE-015 — by design.
+  conformance: core
+
+stacks:
+  - node
+
+# No project rule yet. The Foundation covers everything this repository needs
+# so far, and a rule appears when friction produces one (§29, §30.2).
+rules: []
+
+quality:
+  capabilities:
+    format: required
+    lint: required
+    test: required
+  signals:
+    # Tighter than the node default: governance code is read far more often
+    # than it is written.
+    large_file_loc: 300
+
+governance:
+  waivers: .ai/waivers

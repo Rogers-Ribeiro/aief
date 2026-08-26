@@ -1,0 +1,56 @@
+{
+  "$id": "https://aief.dev/schemas/waiver.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A deviation made visible. Scope and reason are required; expiry is strongly advised.",
+  "properties": {
+    "created_at": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "expires_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "owner": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "reason": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "risk": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rule_id": {
+      "minLength": 1,
+      "pattern": "^[A-Z][A-Z0-9]*(-[A-Z0-9]+)*-\\d{3,}$",
+      "type": "string"
+    },
+    "scope": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "tracking_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "rule_id",
+    "scope",
+    "reason",
+    "owner",
+    "created_at"
+  ],
+  "title": "AIEF Waiver",
+  "type": "object"
+}
