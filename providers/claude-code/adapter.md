@@ -12,6 +12,15 @@ projection, never a policy source (§6).
 foundation/rules/*.yaml       rule intents, modes and enforcement categories
 ```
 
+## Projection status
+
+`aief render` generates the managed region of `AGENTS.md`, the neutral entry point this
+provider consumes. That region is verified against the composition by `aief render --check`
+and by health checks H9 and L4 — drift is a build failure, not a discrepancy someone notices.
+
+Every other file in the table below is still **contract only**: documented, not generated. A
+table row is a claim about what the adapter does; these rows describe what it will do.
+
 ## Provider files created or mapped
 
 | File                    | Contents                                                       | Authored or generated |

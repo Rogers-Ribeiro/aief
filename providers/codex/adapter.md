@@ -2,8 +2,7 @@
 
 Documented against the adapter contract in AIEF-000 §39.
 
-**Status: contract only.** No projection generator exists yet, and the capability
-statuses below are declared rather than verified. Declaring an unverified capability
+**The capability statuses below are declared rather than verified.** Declaring an unverified capability
 as working would be the same defect as a Stack Profile claiming `supported: true`
 with no binding behind it.
 
@@ -31,6 +30,15 @@ documentation and testing against the installed version — not by assuming beha
 that sounds plausible (AIEF-QUAL-010).
 
 Verified locally at the time of writing: `codex-cli 0.148.0`.
+
+## Projection status
+
+`aief render` generates the managed region of `AGENTS.md`, the neutral entry point this
+provider consumes. That region is verified against the composition by `aief render --check`
+and by health checks H9 and L4 — drift is a build failure, not a discrepancy someone notices.
+
+Every other file in the table below is still **contract only**: documented, not generated. A
+table row is a claim about what the adapter does; these rows describe what it will do.
 
 ## Provider files created or mapped
 

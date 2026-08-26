@@ -58,8 +58,8 @@ no dependency added beyond the YAML parser without its own recorded decision
 | 13 `cli compose`              | done        | `npm run compose`                                                 |
 | 14–15 `cli init`              | done        | 4 end-to-end tests in a temporary directory (`test/init.test.js`) |
 | 16 Stack Profile `node`       | done        | binds format, lint, test, dependency_audit and raises those rules |
-| 17 Provider projection        | **partial** | §39 contract documented; the projection generator is not built    |
-| 18 Dogfooding                 | **partial** | composes locally; the three-platform CI matrix has never run      |
+| 17 Provider projection        | done        | `aief render` + drift detection; 7 projection tests               |
+| 18 Dogfooding                 | **partial** | composes locally and in a second project; CI matrix never ran     |
 
 ### Defect found and fixed after the first status entry
 
@@ -71,6 +71,20 @@ existed. Recorded in ADR-0005, corrected as §8.5 / `AIEF-CORE-019`, and now cov
 
 The lesson is about the acceptance criteria, not the bug: AC1 was marked satisfied on the
 strength of the code paths existing. It was only false once someone ran it.
+
+### Validation across projects (§54)
+
+| Project | Stacks | Result                                                                                                                                                                        |
+| ------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `aief`  | node   | 63 rules, 12 enforced. Foundation resolved from the workspace.                                                                                                                |
+| `faro`  | none   | 63 rules, 8 enforced. Foundation resolved from the **cache**, offline, with no absolute path in any artifact — the §18.4 / C9 invariant holding under a real second consumer. |
+
+The second project earned two fixes it would otherwise have hidden: a cached Foundation now
+carries its Stack Profiles as a self-contained bundle, and the §55.1 contamination scan
+excludes those bundled profiles instead of reporting every binding command in them.
+
+A third materially different project is still missing, and a stackless project is a weak test
+of stack binding. The next one should bring a stack that is not node.
 
 ### Not verified
 

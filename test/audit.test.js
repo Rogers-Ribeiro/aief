@@ -7,12 +7,13 @@
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { audit } from '../src/audit/index.js';
 import { compose } from '../src/resolve/index.js';
 import { rule, foundation, project, stack, capability, waiver } from './helpers.js';
+import { renderProjection, writeProjection, PROJECTION_TARGET } from '../src/projection/index.js';
 
 /**
  * Builds a throwaway repository on disk, because L1 and L2 read files and H3
@@ -115,7 +116,7 @@ test('a declared gap carries its reason, so it cannot read as a satisfied check'
   const declared = report.checks.filter((c) => c.status === 'not_implemented');
   assert.deepEqual(
     declared.map((c) => c.id),
-    ['H4', 'H8', 'H9', 'H10', 'L4'],
+    ['H4', 'H8', 'H10'],
   );
   for (const chk of declared) assert.ok(chk.detail.length > 40, `${chk.id} gives no reason`);
 });
@@ -200,7 +201,7 @@ test('AC9 / H12 — the unmet conformance message names the specific missing che
   const h12 = find(report, 'H12');
   assert.equal(h12.status, 'fail');
   const text = h12.findings.join('\n');
-  for (const id of ['H4', 'H8', 'H9', 'H10', 'L4']) {
+  for (const id of ['H4', 'H8', 'H10']) {
     assert.ok(text.includes(id), `the refusal should name ${id}`);
   }
 });
@@ -290,6 +291,55 @@ test('AC3 — the audit reads only; the scaffolded repository is unchanged', () 
     // The only artifacts present must be the ones scaffold() created.
     assert.deepEqual(readdirSync(dir).sort(), ['AGENTS.md', 'foundation']);
     assert.deepEqual(readdirSync(foundationDir).sort(), ['AIEF-000-foundation.md', 'rules']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('L1 ignores Stack Profiles bundled inside a cached Foundation directory', () => {
+  const { dir, foundationDir } = scaffold();
+  try {
+    // Reproduces the cache layout: rules/ and stacks/ side by side under the
+    // version directory. Without the exclusion, the node profile's own binding
+    // commands would be reported as Foundation contamination.
+    mkdirSync(join(foundationDir, 'stacks', 'node'), { recursive: true });
+    const bundled = join(foundationDir, 'stacks', 'node', 'profile.yaml');
+    writeFileSync(bundled, 'name: node\ncapabilities:\n  lint:\n    command: npm run lint\n');
+
+    const f = foundation([rule('AIEF-CORE-001')], { dir: foundationDir });
+    const p = project();
+    const s = { ...stack('node', { lint: capability('npm run lint') }), file: bundled };
+    const composition = compose({ foundation: f, project: p, stacks: [s] });
+    const report = audit({ cwd: dir, foundation: f, project: p, stacks: [s], composition });
+
+    assert.equal(find(report, 'L1').status, 'pass', find(report, 'L1').findings.join('\n'));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('H9 and L4 pass when the repository projects nothing at all', () => {
+  const report = run();
+  assert.equal(find(report, 'H9').status, 'pass');
+  assert.match(find(report, 'H9').detail, /nothing projected, nothing to drift/);
+  assert.equal(find(report, 'L4').status, 'pass');
+});
+
+test('H9 and L4 fail once a managed region exists and no longer matches', () => {
+  const { dir, foundationDir } = scaffold();
+  try {
+    const f = foundation([rule('AIEF-CORE-001')], { dir: foundationDir });
+    const p = project();
+    const composition = compose({ foundation: f, project: p });
+    writeProjection(dir, renderProjection(composition));
+
+    const target = join(dir, PROJECTION_TARGET);
+    writeFileSync(target, readFileSync(target, 'utf8').replace('Enforced', 'Unenforced'), 'utf8');
+
+    const report = audit({ cwd: dir, foundation: f, project: p, composition });
+    assert.equal(find(report, 'H9').status, 'fail');
+    assert.equal(find(report, 'L4').status, 'fail');
+    assert.equal(report.ok, false);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

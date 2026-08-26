@@ -1,25 +1,35 @@
-# AGENTS.md — {{ project.name }}
+# AGENTS.md — <project name>
+
+<!--
+  This template is the hand-authored half of the entry point.
+
+  `aief render` owns the region between the aief markers and overwrites it from
+  the composed configuration. Everything outside the markers is yours: it holds
+  what the composition cannot know — what this repository is, where things live,
+  and the traps someone hit here last month.
+
+  Write the prose. Never restate an engineering rule below; a rule that exists
+  only in a provider file is a defect (§6).
+-->
 
 ## Purpose
 
-{{ project.summary }}
+<one paragraph: what this repository is, and what it is not>
 
-## Non-negotiable rules
+## Where things belong
 
-{{ effective.core_instructions }}
+<a table mapping concern to directory — the map an agent needs before its first edit>
 
-## Where things are
+## Traps specific to this repository
 
-{{ effective.location_map }}
-
-## Commands
-
-{{ effective.commands }}
-
-## Applicable scoped guidance
-
-{{ effective.rule_triggers }}
+<what someone got wrong here and would get wrong again. Empty is honest; invented is not.>
 
 ## Definition of Done
 
-{{ effective.definition_of_done }}
+<the local completion bar, on top of the Foundation §49>
+
+<!-- aief:begin -->
+
+_Run `aief render --write` to populate this region._
+
+<!-- aief:end -->

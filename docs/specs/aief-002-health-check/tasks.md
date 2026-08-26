@@ -16,7 +16,8 @@
 | 10 L2 Stack contamination                   | done  | project id and name, scanned against each Stack Profile          |
 | 11 L3 Project leakage upward                | done  | an invented rule id is an implicit Foundation edit request       |
 | 12 `aief health` + report renderer          | done  | `npm run health`; wired into `npm run verify` and CI             |
-| 13 Tests                                    | done  | 17 audit tests; every failing path observed to fail              |
+| 13 Tests                                    | done  | 19 audit tests; every failing path observed to fail              |
+| 14 H9 / L4 projection drift                 | done  | landed with AIEF-001 task 17; drift is a build failure           |
 
 Verification, 2026-08-26:
 
@@ -24,29 +25,35 @@ Verification, 2026-08-26:
 npm run verify          exit 0
 parity ok — 63 rules across 64 specification sections
 schemas ok — 6 contracts published and satisfied by this repository
-tests 62 · pass 62 · fail 0
+tests 72 · pass 72 · fail 0
 compose  63 rules · 12 enforced · 51 advisory · 0 off · 0 waived
-health   11 pass · 0 fail · 0 warn · 5 not implemented
+health   13 pass · 0 fail · 0 warn · 3 not implemented
 ```
 
 ## Declared not implemented
 
-Five detections are reported by `aief health` with their reasons rather than omitted.
+Three detections are reported by `aief health` with their reasons rather than omitted. H9 and
+L4 were on this list until the provider projection generator landed (AIEF-001 task 17); both
+are now real checks against real drift.
 
 | ID  | Detection                   | Closed by                                      |
 | --- | --------------------------- | ---------------------------------------------- |
 | H4  | stale rules                 | §30.4 measurement data — no work item yet      |
 | H8  | unused roles and skills     | whichever work item introduces roles or skills |
-| H9  | provider projection drift   | AIEF-001 task 17                               |
 | H10 | Stack Profile binding drift | a Stack Profile self-check contract            |
-| L4  | provider truth drift        | AIEF-001 task 17                               |
 
 ## Conformance after this work item
 
-`conformance: full` is still refused, and correctly so. F5 and F6 are partial, F7 is untouched.
-The value delivered is that the refusal now names what is missing instead of naming a work item.
+`conformance: full` is still refused, and correctly so.
 
-Two of the five gaps close together with AIEF-001 task 17.
+```text
+F5  partial — H4, H8 and H10 remain
+F6  complete
+F7  absent — AIEF-003
+```
+
+The refusal now names what is missing instead of naming a work item. F6 closing means the
+layer boundaries this framework exists to protect are machine-checked end to end.
 
 ## Not done
 

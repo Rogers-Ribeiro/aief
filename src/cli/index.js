@@ -18,6 +18,12 @@ import { ArtifactError } from '../load/yaml.js';
 import { compose } from '../resolve/index.js';
 import { audit } from '../audit/index.js';
 import {
+  renderProjection,
+  checkProjection,
+  writeProjection,
+  PROJECTION_TARGET,
+} from '../projection/index.js';
+import {
   renderReport,
   renderHealthReport,
   writeEffectiveConfig,
@@ -33,6 +39,11 @@ const USAGE = `aief — AI Engineering Foundation
   aief health [--verbose] [--foundation <path>]
       Audit the governance configuration: §48 health checks and §55
       layer-boundary tests. Read-only. Exits non-zero on any failed check.
+
+  aief render [--write] [--check] [--foundation <path>]
+      Project the composed configuration into AGENTS.md, inside the
+      managed region. Content outside the markers is never touched.
+      --check exits non-zero on drift; without --write nothing is written.
 
   aief init --id <project-id> [--stack <name>]... [--conformance core|full] [--yes]
       Bootstrap a repository onto a referenced Foundation version.
@@ -123,6 +134,73 @@ function cmdHealth(argv, cwd) {
   process.stdout.write(`${renderHealthReport(report, { verbose: values.verbose })}
 `);
   process.exit(report.ok ? 0 : 1);
+}
+
+function cmdRender(argv, cwd) {
+  const { values } = parseArgs({
+    args: argv,
+    options: {
+      write: { type: 'boolean', default: false },
+      check: { type: 'boolean', default: false },
+      foundation: { type: 'string' },
+    },
+    allowPositionals: false,
+  });
+
+  const { project, foundation, stacks, waivers } = loadAll(cwd, {
+    foundationPath: values.foundation,
+  });
+  const result = compose({ foundation, project, stacks, waivers });
+  if (!result.ok) {
+    fatal(
+      `${renderReport(result)}
+
+refusing to project a configuration that does not compose. ` +
+        `A projection of a broken source is a confident lie.`,
+    );
+  }
+
+  const block = renderProjection(result);
+  const state = checkProjection(cwd, block);
+
+  if (values.check) {
+    if (state.status === 'ok') {
+      process.stdout.write(`${PROJECTION_TARGET} is in sync with the composition
+`);
+      return;
+    }
+    const why = {
+      drift: 'the managed region no longer matches the composition',
+      absent: 'the managed region is missing — run: aief render --write',
+      'missing-file': `${PROJECTION_TARGET} does not exist — run: aief render --write`,
+    }[state.status];
+    fatal(`projection drift in ${PROJECTION_TARGET}: ${why} (§55.4)`);
+  }
+
+  if (!values.write) {
+    // §38 — show before write, always.
+    process.stdout.write(`${block}
+
+`);
+    process.stdout.write(
+      `target: ${PROJECTION_TARGET}, managed region only
+` +
+        `state: ${state.status}
+` +
+        `nothing written. Re-run with --write to apply.
+`,
+    );
+    return;
+  }
+
+  if (state.status === 'ok') {
+    process.stdout.write(`${PROJECTION_TARGET} already in sync — nothing to write
+`);
+    return;
+  }
+  writeProjection(cwd, block);
+  process.stdout.write(`wrote the managed region in ${PROJECTION_TARGET}
+`);
 }
 
 function renderProjectProfile({ id, stacks, conformance, foundationVersion }) {
@@ -223,6 +301,8 @@ function main() {
         return cmdCompose(rest, cwd);
       case 'health':
         return cmdHealth(rest, cwd);
+      case 'render':
+        return cmdRender(rest, cwd);
       case 'init':
         return cmdInit(rest, cwd);
       case undefined:

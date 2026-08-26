@@ -37,6 +37,9 @@ jobs:
       - name: compose (dogfooding — AC14)
         run: npm run compose
 
+      - name: render --check (§55.4 — the projection matches the composition)
+        run: npm run render:check
+
       - name: health (AIEF-002 — §48 health checks and §55 layer boundaries)
         run: npm run health
 

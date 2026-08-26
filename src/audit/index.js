@@ -12,6 +12,7 @@ import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 
 import { join, relative } from 'node:path';
 import { CAPABILITIES } from '../model/schema.js';
+import { renderProjection, checkProjection, PROJECTION_TARGET } from '../projection/index.js';
 
 /** §13. A starting point, not a universal truth — override per project. */
 export const DEFAULT_ALWAYS_LOADED_BYTES = 20000;
@@ -43,10 +44,19 @@ function normalizeIntent(text) {
     .trim();
 }
 
-function listFiles(dir, out = []) {
+/**
+ * Files that belong to the Foundation itself.
+ *
+ * A cached Foundation is distributed as a self-contained bundle, so `stacks/`
+ * can sit inside the same directory. Those are Stack Profiles, not Foundation
+ * artifacts: scanning them for stack vocabulary would report every binding
+ * command in them as contamination of the layer they legitimately belong to.
+ */
+function listFoundationFiles(dir, out = [], top = true) {
   for (const entry of readdirSync(dir)) {
+    if (top && entry === 'stacks') continue;
     const full = join(dir, entry);
-    if (statSync(full).isDirectory()) listFiles(full, out);
+    if (statSync(full).isDirectory()) listFoundationFiles(full, out, false);
     else out.push(full);
   }
   return out;
@@ -220,16 +230,24 @@ export function audit({ cwd, foundation, project, stacks = [], waivers = [], com
     ),
   );
 
-  // H9 — provider projection drift.
-  checks.push(
-    pending(
-      'H9',
-      'provider projection drift',
-      '§55.4',
-      'drift is the difference between a generated projection and the committed one. ' +
-        'No projection generator exists — AIEF-001 task 17.',
-    ),
-  );
+  // H9 / L4 — provider projection drift. One computation, reported under both
+  // §48 and §55.4, because it is one property: the committed projection must be
+  // reproducible from the composed source.
+  //
+  // Only a projection that exists can drift. A repository with no managed
+  // region has made no claim to keep true, so the audit reports that and moves
+  // on; `aief render --check` is where an absent projection is an error,
+  // because there the reader asked for one explicitly.
+  const block = renderProjection(composition);
+  const projection = checkProjection(cwd, block);
+  const driftDetail = {
+    ok: `${PROJECTION_TARGET} matches the composition`,
+    drift: `the managed region in ${PROJECTION_TARGET} no longer matches — run: aief render --write`,
+    absent: `${PROJECTION_TARGET} carries no managed region — nothing projected, nothing to drift`,
+    'missing-file': `no ${PROJECTION_TARGET} — nothing projected, nothing to drift`,
+  }[projection.status];
+  const driftStatus = projection.status === 'drift' ? 'fail' : 'pass';
+  checks.push(check('H9', 'provider projection drift', '§55.4', driftStatus, driftDetail));
 
   // H10 — Stack Profile binding drift.
   checks.push(
@@ -309,7 +327,7 @@ export function audit({ cwd, foundation, project, stacks = [], waivers = [], com
   const idIsFoundationOwn = projectId && namespacePrefixes.has(String(projectId).toLowerCase());
   if (projectId && !idIsFoundationOwn) banned.push({ term: projectId, kind: 'project id' });
 
-  const foundationFiles = listFiles(foundation.dir);
+  const foundationFiles = listFoundationFiles(foundation.dir);
   const l1 = scanForTerms(foundationFiles, banned, cwd);
   checks.push(
     check(
@@ -357,14 +375,17 @@ export function audit({ cwd, foundation, project, stacks = [], waivers = [], com
     ),
   );
 
-  // L4 — Provider truth drift.
+  // L4 — Provider truth drift. Same property as H9, stated by §55.4 as a layer
+  // boundary rather than as configuration hygiene.
   checks.push(
-    pending(
+    check(
       'L4',
       'Provider truth drift',
       '§55.4',
-      'reproducing a projection from the composed source requires the generator — ' +
-        'AIEF-001 task 17.',
+      driftStatus,
+      projection.status === 'ok'
+        ? 'the projection is reproducible from the composed source'
+        : driftDetail,
     ),
   );
 

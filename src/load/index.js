@@ -117,6 +117,11 @@ export function hasProjectProfile(cwd) {
 export function loadStackProfile(name, { cwd, foundationDir }) {
   const candidates = [
     cwd && join(cwd, 'stacks', name, 'profile.yaml'),
+    // A cached Foundation is a self-contained bundle: rules/ and stacks/ sit
+    // side by side under the version directory.
+    foundationDir && join(foundationDir, 'stacks', name, 'profile.yaml'),
+    // In a workspace checkout the Foundation is one directory inside the repo,
+    // and stacks/ is its sibling.
     foundationDir && join(foundationDir, '..', 'stacks', name, 'profile.yaml'),
   ].filter(Boolean);
 

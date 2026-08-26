@@ -39,9 +39,9 @@ const JUDGEMENT_ONLY = new Set(['review', 'documentation']);
  */
 const UNIMPLEMENTED_FULL = {
   F5:
-    'configuration health check (§48) — H4 stale rules, H8 unused roles and skills, ' +
-    'H9 provider projection drift and H10 Stack Profile binding drift are not implemented',
-  F6: 'layer-boundary tests (§55) — L4 provider truth drift is not implemented',
+    'configuration health check (§48) — H4 stale rules, H8 unused roles and skills ' +
+    'and H10 Stack Profile binding drift are not implemented',
+  F6: 'layer-boundary tests (§55) — complete; F5 is what still blocks the level',
   F7: 'mechanical baseline monotonicity (§46) — AIEF-003',
 };
 
