@@ -34,17 +34,17 @@ const JUDGEMENT_ONLY = new Set(['review', 'documentation']);
  * Full-conformance requirements this engine version cannot yet satisfy.
  *
  * Named per missing detection rather than per requirement. "AIEF-002" as a
- * reason tells the reader to wait; naming H4, H8, H9, H10 and L4 tells them
- * what is actually absent and lets them judge whether it matters to them.
+ * reason tells the reader to wait; naming the absent checks lets them judge
+ * whether the gap matters to them.
+ *
+ * A requirement leaves this map when it is delivered. Listing a satisfied
+ * requirement as a blocker is the same defect as claiming an unsatisfied one —
+ * both make the conformance report untrustworthy.
  */
 const UNIMPLEMENTED_FULL = {
   F5:
     'configuration health check (§48) — H4 stale rules, H8 unused roles and skills ' +
     'and H10 Stack Profile binding drift are not implemented',
-  F6: 'layer-boundary tests (§55) — complete; F5 is what still blocks the level',
-  F7:
-    'mechanical baseline monotonicity (§46) — implemented for capabilities whose Stack ' +
-    'Profile declares violation identities; unmeasurable capabilities are reported, not counted',
 };
 
 const LAYER_ORDER = { foundation: 0, stack: 1, project: 2 };

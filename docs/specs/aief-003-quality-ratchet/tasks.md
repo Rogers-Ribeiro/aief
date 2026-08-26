@@ -54,7 +54,9 @@ F7 is deliberately phrased as a capability, not a blanket claim. The node profil
 identities for `lint` only; `format`, `test` and `dependency_audit` report as **unmeasurable**
 rather than as zero, because a silent zero is how a ratchet comes to guard nothing (§46.5).
 
-`conformance: full` is still refused, and F5 is now the only thing refusing it.
+`conformance: full` is still refused, and F5 is now the only thing refusing it. F6 and F7 were
+removed from the engine’s unmet-requirement list when they landed: listing a satisfied
+requirement as a blocker is the same defect as claiming an unsatisfied one.
 
 ## Not done
 
