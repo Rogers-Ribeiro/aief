@@ -226,8 +226,9 @@ export function audit({ cwd, foundation, project, stacks = [], waivers = [], com
       'H8',
       'unused roles and skills',
       '§48',
-      'no role or skill artifact type exists in this implementation yet. Building the ' +
-        'detector before the artifact would be the empty scaffolding §29 prohibits.',
+      'templates/roles/ and templates/skills/ hold starting points to copy, but nothing ' +
+        'links a role or a skill to a rule. Detection needs that link, not the file: without ' +
+        'it, "unused" can only mean "not mentioned anywhere", which every template is.',
     ),
   );
 
