@@ -10,7 +10,7 @@
  * that enforces it — stay in `schema.js` and in the resolver. Schema-valid is
  * necessary, never sufficient.
  */
-import { MODES, CONFORMANCE_LEVELS, CAPABILITIES } from './schema.js';
+import { MODES, CONFORMANCE_LEVELS, CAPABILITIES, IDENTITY_FORMATS } from './schema.js';
 
 const BASE = 'https://aief.dev/schemas';
 const DRAFT = 'https://json-schema.org/draft/2020-12/schema';
@@ -97,6 +97,18 @@ const capabilitySpec = {
       properties: {
         command: str(),
         failure: { type: 'string' },
+      },
+      additionalProperties: false,
+    },
+    identities: {
+      description:
+        'How this capability names its violations, for the quality ratchet (§46). ' +
+        'argv rather than a command string so the engine never needs a shell (ADR-0006).',
+      type: 'object',
+      required: ['argv', 'format'],
+      properties: {
+        argv: { type: 'array', minItems: 1, items: str() },
+        format: { enum: IDENTITY_FORMATS },
       },
       additionalProperties: false,
     },
@@ -216,6 +228,11 @@ export const waiverSchema = {
     created_at: str(),
     expires_at: { type: ['string', 'null'] },
     tracking_ref: { type: ['string', 'null'] },
+    identities: {
+      description: 'Violation identities this waiver accepts into the baseline (§46.2).',
+      type: 'array',
+      items: str(),
+    },
     risk: { type: ['string', 'null'] },
   },
   additionalProperties: false,

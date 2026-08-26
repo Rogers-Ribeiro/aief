@@ -14,6 +14,14 @@
         "null"
       ]
     },
+    "identities": {
+      "description": "Violation identities this waiver accepts into the baseline (§46.2).",
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
     "owner": {
       "minLength": 1,
       "type": "string"

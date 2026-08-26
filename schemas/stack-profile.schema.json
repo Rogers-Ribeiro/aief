@@ -34,6 +34,30 @@
             ],
             "type": "object"
           },
+          "identities": {
+            "additionalProperties": false,
+            "description": "How this capability names its violations, for the quality ratchet (§46). argv rather than a command string so the engine never needs a shell (ADR-0006).",
+            "properties": {
+              "argv": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              "format": {
+                "enum": [
+                  "eslint-json"
+                ]
+              }
+            },
+            "required": [
+              "argv",
+              "format"
+            ],
+            "type": "object"
+          },
           "supported": {
             "type": "boolean"
           }

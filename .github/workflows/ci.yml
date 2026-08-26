@@ -40,6 +40,9 @@ jobs:
       - name: render --check (§55.4 — the projection matches the composition)
         run: npm run render:check
 
+      - name: baseline (§46 — no new debt, by violation identity)
+        run: npm run baseline
+
       - name: health (AIEF-002 — §48 health checks and §55 layer boundaries)
         run: npm run health
 

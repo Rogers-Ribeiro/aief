@@ -42,7 +42,9 @@ const UNIMPLEMENTED_FULL = {
     'configuration health check (§48) — H4 stale rules, H8 unused roles and skills ' +
     'and H10 Stack Profile binding drift are not implemented',
   F6: 'layer-boundary tests (§55) — complete; F5 is what still blocks the level',
-  F7: 'mechanical baseline monotonicity (§46) — AIEF-003',
+  F7:
+    'mechanical baseline monotonicity (§46) — implemented for capabilities whose Stack ' +
+    'Profile declares violation identities; unmeasurable capabilities are reported, not counted',
 };
 
 const LAYER_ORDER = { foundation: 0, stack: 1, project: 2 };

@@ -1,0 +1,10 @@
+{
+  "capabilities": {
+    "lint": {
+      "identities": []
+    }
+  },
+  "note": "Accepted debt, by violation identity. Reviewable governance configuration (§46.1).",
+  "version": 1
+}
+

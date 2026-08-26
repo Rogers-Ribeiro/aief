@@ -30,7 +30,8 @@
     "health": "node src/cli/index.js health",
     "render": "node src/cli/index.js render",
     "render:check": "node src/cli/index.js render --check",
-    "verify": "npm run format:check && npm run lint && npm run parity && npm run schemas && npm test && npm run compose && npm run render:check && npm run health",
+    "baseline": "node src/cli/index.js baseline",
+    "verify": "npm run format:check && npm run lint && npm run parity && npm run schemas && npm test && npm run compose && npm run render:check && npm run baseline && npm run health",
     "parity": "node scripts/check-parity.js",
     "schemas": "node scripts/schemas.js",
     "schemas:write": "node scripts/schemas.js --write"

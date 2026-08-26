@@ -13,6 +13,7 @@ import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { CAPABILITIES } from '../model/schema.js';
 import { renderProjection, checkProjection, PROJECTION_TARGET } from '../projection/index.js';
+import { readBaseline } from '../ratchet/index.js';
 
 /** §13. A starting point, not a universal truth — override per project. */
 export const DEFAULT_ALWAYS_LOADED_BYTES = 20000;
@@ -298,6 +299,26 @@ export function audit({ cwd, foundation, project, stacks = [], waivers = [], com
         ? 'the declared level exceeds what this engine delivers'
         : `declared "${composition.meta.conformance}"`,
       conformance,
+    ),
+  );
+
+  // H13 — §46.4: the ratchet reports remaining debt, new and resolved violations
+  // on every run. Read from the recorded baseline, never re-measured: measuring
+  // means executing, and `health` executes nothing (ADR-0006).
+  const baseline = readBaseline(cwd);
+  const tracked = Object.entries(baseline?.capabilities ?? {});
+  const debt = tracked.reduce((n, [, c]) => n + (c.identities?.length ?? 0), 0);
+  checks.push(
+    check(
+      'H13',
+      'quality ratchet baseline',
+      '§46.4',
+      'pass',
+      baseline
+        ? `${debt} accepted violation(s) across ${tracked.length} capability(ies) — ` +
+            `run aief baseline to compare against current`
+        : 'no baseline recorded — nothing accepted, so nothing can be made worse',
+      tracked.map(([cap, c]) => `${cap}: ${c.identities?.length ?? 0} accepted`),
     ),
   );
 

@@ -39,6 +39,9 @@ export const TOOL_BOUND = {
   dependency: 'dependency_audit',
 };
 
+/** Violation-identity parser shapes the engine implements (§46, AIEF-003). */
+export const IDENTITY_FORMATS = ['eslint-json'];
+
 const MODE_RANK = { off: 0, advisory: 1, enforced: 2 };
 
 /** Ordering used to decide whether an override weakens a rule (§11.2). */
@@ -145,6 +148,7 @@ export function validateStackProfile(doc, path) {
     if (!spec.supported && spec.binding?.command) {
       errors.push(`${cp}: declared supported:false but provides a binding.command`);
     }
+    validateIdentities(spec.identities, `${cp}.identities`, errors);
   }
 
   const signals = doc?.signals ?? {};
@@ -161,6 +165,29 @@ export function validateStackProfile(doc, path) {
   else rules.forEach((r, i) => validateStackRule(r, `${path}.rules[${i}]`, errors));
 
   return { ok: errors.length === 0, errors, name };
+}
+
+/**
+ * How a capability names its violations, for the quality ratchet (§46, ADR-0006).
+ *
+ * argv rather than a command string is a safety property, not a style choice:
+ * the engine spawns it without a shell, so a profile cannot chain, redirect or
+ * substitute. Validating the shape here is what makes that guarantee checkable.
+ */
+function validateIdentities(decl, path, errors) {
+  if (decl === undefined || decl === null) return;
+  if (typeof decl !== 'object' || Array.isArray(decl)) {
+    errors.push(`${path}: must be a mapping`);
+    return;
+  }
+  const argv = decl.argv;
+  if (!Array.isArray(argv) || argv.length === 0) {
+    errors.push(`${path}.argv: must be a non-empty list — a command string would need a shell`);
+  } else if (argv.some((a) => typeof a !== 'string' || a === '')) {
+    errors.push(`${path}.argv: every element must be a non-empty string`);
+  }
+  oneOf(decl.format, IDENTITY_FORMATS, 'format', path, errors);
+  if (decl.format === undefined) errors.push(`${path}: missing required field "format"`);
 }
 
 /** A Stack Profile may restate a Foundation rule to bind or re-scope it. */
@@ -203,6 +230,9 @@ export function validateWaiver(w, path, errors) {
   req(w, 'reason', path, errors);
   req(w, 'owner', path, errors);
   req(w, 'created_at', path, errors);
+  if (w?.identities !== undefined && !Array.isArray(w.identities)) {
+    errors.push(`${path}: "identities" must be a list of violation identities (§46.2)`);
+  }
   if (w?.expires_at !== undefined && w.expires_at !== null) {
     if (Number.isNaN(Date.parse(w.expires_at))) {
       errors.push(`${path}: "expires_at" is not a parsable date — got "${w.expires_at}"`);

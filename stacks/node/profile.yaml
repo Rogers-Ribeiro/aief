@@ -17,6 +17,12 @@ capabilities:
     binding:
       command: npm run lint
       failure: nonzero exit means lint errors
+    # How this capability names its violations, for the ratchet (§46).
+    # argv, never a command string: the engine spawns it without a shell so a
+    # profile cannot chain, redirect or substitute (ADR-0006).
+    identities:
+      argv: [node, node_modules/eslint/bin/eslint.js, --format, json, src, test, scripts]
+      format: eslint-json
   test:
     supported: true
     binding:

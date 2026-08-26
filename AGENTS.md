@@ -24,36 +24,40 @@ Conformance declared in `.ai/project.yaml`: **core**.
 
 ## Where things belong
 
-| Concern                                | Location                                   |
-| -------------------------------------- | ------------------------------------------ |
-| Normative policy                       | `foundation/AIEF-000-foundation.md`        |
-| Addressable rule intents               | `foundation/rules/*.yaml` (ADR-0002)       |
-| Machine-readable contracts             | `schemas/*.json`                           |
-| Engine implementation                  | `src/{model,load,resolve,audit,emit,cli}/` |
-| Repository-development utilities       | `scripts/`                                 |
-| Stack bindings                         | `stacks/<stack>/`                          |
-| Provider projection contracts          | `providers/<provider>/`                    |
-| Templates rendered into other projects | `templates/`                               |
-| This repository's own parameters       | `.ai/project.yaml`, `.ai/waivers/`         |
-| Implementation specs                   | `docs/specs/`                              |
-| Architecture decisions                 | `docs/adr/`                                |
+| Concern                                | Location                                                      |
+| -------------------------------------- | ------------------------------------------------------------- |
+| Normative policy                       | `foundation/AIEF-000-foundation.md`                           |
+| Addressable rule intents               | `foundation/rules/*.yaml` (ADR-0002)                          |
+| Machine-readable contracts             | `schemas/*.json`                                              |
+| Engine implementation                  | `src/{model,load,resolve,audit,projection,ratchet,emit,cli}/` |
+| Repository-development utilities       | `scripts/`                                                    |
+| Stack bindings                         | `stacks/<stack>/`                                             |
+| Provider projection contracts          | `providers/<provider>/`                                       |
+| Templates rendered into other projects | `templates/`                                                  |
+| This repository's own parameters       | `.ai/project.yaml`, `.ai/waivers/`                            |
+| Implementation specs                   | `docs/specs/`                                                 |
+| Architecture decisions                 | `docs/adr/`                                                   |
 
 ## Commands
 
 ```text
 npm run verify        format + lint + parity + test + compose. Run before claiming done.
-npm test              62 tests
+npm test              86 tests
 npm run compose       resolve this repository's own configuration
 npm run health        §48 health checks and §55 layer-boundary tests, read-only
 npm run render        project the composition into this file's managed region
+npm run baseline      §46 ratchet. The only command that executes stack tooling.
 npm run parity        ADR-0002: prose and rule sidecar must agree
 node src/cli/index.js compose --verbose    per-rule modes, bindings and provenance
 ```
 
 ## Module boundaries
 
-Dependencies point one way. `cli → {audit, emit} → resolve → load → model`. Nothing depends
-on `cli/`.
+Dependencies point one way. `cli → {audit, projection, ratchet, emit} → resolve → load → model`.
+Nothing depends on `cli/`.
+
+`ratchet/` is the only module that may import `node:child_process`, and a test enforces that
+(ADR-0006). `compose`, `health`, `render` and `init` spawn nothing.
 
 `resolve/` composes. It does not audit. `audit/` reads a composition and judges it, and never
 writes: a checker that repairs what it finds cannot be trusted to report honestly. Baseline
@@ -134,13 +138,13 @@ npm run lint  # lint
 npm test  # test
 ```
 
-## Advisory — 51 rule(s)
+## Advisory — 52 rule(s)
 
 Not enumerated here on purpose: an always-loaded file spends context on every line it carries (§13). Run `aief compose --verbose` for the full list.
 
 - `AIEF-CORE` — 11
 - `AIEF-FLOW` — 14
-- `AIEF-QUAL` — 12
+- `AIEF-QUAL` — 13
 - `AIEF-SEC` — 7
 - `AIEF-TEST` — 7
 

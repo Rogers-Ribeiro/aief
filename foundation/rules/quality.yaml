@@ -80,6 +80,13 @@ rules:
     conformance: core
     section: '§50'
 
+  - id: AIEF-QUAL-015
+    intent: 'Accepted debt is recorded by violation identity, and new debt does not make the baseline worse.'
+    default_mode: advisory
+    enforcement_category: governance
+    conformance: full
+    section: '§46'
+
   - id: AIEF-QUAL-013
     intent: "Source conforms to the ecosystem's formatter, so that diffs carry meaning rather than style noise."
     # Tool-bound: advisory until a Stack Profile binds the capability (§8.5).

@@ -139,3 +139,44 @@ export function renderHealthReport(report, { verbose = false } = {}) {
   }
   return lines.join('\n');
 }
+
+/**
+ * Renders a ratchet comparison (§46.4): remaining debt, new violations and
+ * resolved violations, on every run. A capability with no violation identities
+ * is reported as unmeasurable rather than as zero — a silent zero is how a
+ * ratchet comes to guard nothing.
+ */
+export function renderRatchetReport(comparison, { verbose = false } = {}) {
+  const lines = [];
+  const c = comparison.counts;
+
+  lines.push(
+    comparison.hasBaseline
+      ? `${c.remaining} remaining  ·  ${c.added} new  ·  ${c.resolved} resolved`
+      : `no baseline recorded  ·  ${c.added} violation(s) measured  ·  ` +
+          `run: aief baseline --write to accept them`,
+  );
+
+  for (const cap of comparison.capabilities) {
+    if (!cap.measured) {
+      lines.push(`  --   ${cap.capability.padEnd(20)} unmeasurable: ${cap.reason}`);
+      continue;
+    }
+    const mark = cap.added.length ? 'FAIL' : 'ok  ';
+    lines.push(
+      `  ${mark} ${cap.capability.padEnd(20)} ` +
+        `${cap.remaining.length} remaining, ${cap.added.length} new, ${cap.resolved.length} resolved`,
+    );
+    for (const id of cap.added) lines.push(`       + ${id}`);
+    if (verbose) for (const id of cap.resolved) lines.push(`       - ${id}`);
+  }
+
+  if (!comparison.ok) {
+    lines.push('');
+    lines.push(
+      `${c.added} new violation(s). Existing debt may be baselined; new debt must not ` +
+        `make the baseline worse (§46).`,
+    );
+  }
+  return lines.join('\n');
+}

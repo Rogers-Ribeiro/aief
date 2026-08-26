@@ -93,6 +93,7 @@ test('AC2 — every §48 and §55 item appears with an explicit state', () => {
     'H10',
     'H11',
     'H12',
+    'H13',
     'L1',
     'L2',
     'L3',
@@ -343,4 +344,11 @@ test('H9 and L4 fail once a managed region exists and no longer matches', () => 
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test('§46.4 — H13 reports accepted debt without re-measuring it', () => {
+  const report = run();
+  const h13 = find(report, 'H13');
+  assert.equal(h13.status, 'pass');
+  assert.match(h13.detail, /no baseline recorded/);
 });

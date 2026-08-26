@@ -5,7 +5,7 @@
  */
 import { parseArgs } from 'node:util';
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join, dirname, sep } from 'node:path';
 import {
   loadFoundation,
   loadProjectProfile,
@@ -18,6 +18,14 @@ import { ArtifactError } from '../load/yaml.js';
 import { compose } from '../resolve/index.js';
 import { audit } from '../audit/index.js';
 import {
+  measure,
+  compare,
+  guardWrite,
+  readBaseline,
+  writeBaseline,
+  toBaseline,
+} from '../ratchet/index.js';
+import {
   renderProjection,
   checkProjection,
   writeProjection,
@@ -26,6 +34,7 @@ import {
 import {
   renderReport,
   renderHealthReport,
+  renderRatchetReport,
   writeEffectiveConfig,
   EFFECTIVE_CONFIG_PATH,
 } from '../emit/index.js';
@@ -44,6 +53,10 @@ const USAGE = `aief — AI Engineering Foundation
       Project the composed configuration into AGENTS.md, inside the
       managed region. Content outside the markers is never touched.
       --check exits non-zero on drift; without --write nothing is written.
+
+  aief baseline [--write] [--verbose] [--foundation <path>]
+      Measure accepted debt by violation identity and fail on new debt (§46).
+      The only command that executes Stack Profile tooling (ADR-0006).
 
   aief init --id <project-id> [--stack <name>]... [--conformance core|full] [--yes]
       Bootstrap a repository onto a referenced Foundation version.
@@ -131,8 +144,7 @@ function cmdHealth(argv, cwd) {
   const composition = compose({ foundation, project, stacks, waivers });
   const report = audit({ cwd, foundation, project, stacks, waivers, composition });
 
-  process.stdout.write(`${renderHealthReport(report, { verbose: values.verbose })}
-`);
+  process.stdout.write(`${renderHealthReport(report, { verbose: values.verbose })}\n`);
   process.exit(report.ok ? 0 : 1);
 }
 
@@ -153,9 +165,8 @@ function cmdRender(argv, cwd) {
   const result = compose({ foundation, project, stacks, waivers });
   if (!result.ok) {
     fatal(
-      `${renderReport(result)}
-
-refusing to project a configuration that does not compose. ` +
+      `${renderReport(result)}\n\n` +
+        `refusing to project a configuration that does not compose. ` +
         `A projection of a broken source is a confident lie.`,
     );
   }
@@ -165,8 +176,7 @@ refusing to project a configuration that does not compose. ` +
 
   if (values.check) {
     if (state.status === 'ok') {
-      process.stdout.write(`${PROJECTION_TARGET} is in sync with the composition
-`);
+      process.stdout.write(`${PROJECTION_TARGET} is in sync with the composition\n`);
       return;
     }
     const why = {
@@ -179,28 +189,72 @@ refusing to project a configuration that does not compose. ` +
 
   if (!values.write) {
     // §38 — show before write, always.
-    process.stdout.write(`${block}
-
-`);
+    process.stdout.write(`${block}\n\n`);
     process.stdout.write(
-      `target: ${PROJECTION_TARGET}, managed region only
-` +
-        `state: ${state.status}
-` +
-        `nothing written. Re-run with --write to apply.
-`,
+      `target: ${PROJECTION_TARGET}, managed region only\n` +
+        `state: ${state.status}\n` +
+        `nothing written. Re-run with --write to apply.\n`,
     );
     return;
   }
 
   if (state.status === 'ok') {
-    process.stdout.write(`${PROJECTION_TARGET} already in sync — nothing to write
-`);
+    process.stdout.write(`${PROJECTION_TARGET} already in sync — nothing to write\n`);
     return;
   }
   writeProjection(cwd, block);
-  process.stdout.write(`wrote the managed region in ${PROJECTION_TARGET}
-`);
+  process.stdout.write(`wrote the managed region in ${PROJECTION_TARGET}\n`);
+}
+
+function cmdBaseline(argv, cwd) {
+  const { values } = parseArgs({
+    args: argv,
+    options: {
+      write: { type: 'boolean', default: false },
+      verbose: { type: 'boolean', short: 'v', default: false },
+      foundation: { type: 'string' },
+    },
+    allowPositionals: false,
+  });
+
+  const { project, foundation, stacks, waivers } = loadAll(cwd, {
+    foundationPath: values.foundation,
+  });
+  // ADR-0006: this is the only verb that executes anything, and only commands a
+  // Stack Profile declared. Composition runs first so a broken configuration is
+  // reported before any process is spawned.
+  const composition = compose({ foundation, project, stacks, waivers });
+  if (!composition.ok) {
+    fatal(
+      `${renderReport(composition)}\n\n` +
+        `refusing to measure against a configuration that does not compose.`,
+    );
+  }
+
+  const measurements = measure({ cwd, stacks });
+  const baseline = readBaseline(cwd);
+  const comparison = compare(measurements, baseline);
+
+  process.stdout.write(`${renderRatchetReport(comparison, { verbose: values.verbose })}\n`);
+
+  if (!values.write) {
+    process.exit(comparison.ok ? 0 : 1);
+  }
+
+  const guard = guardWrite(comparison, waivers);
+  if (!guard.allowed) {
+    const listed = guard.unwaived.map((id) => `  ${id}`).join('\n');
+    fatal(
+      `refusing to grow the baseline. ${guard.unwaived.length} new violation(s) are not ` +
+        `covered by a waiver (§46.2):\n${listed}\n\n` +
+        `Fix them, or add a waiver listing the identities. ` +
+        `A baseline anyone may silently regenerate is not a ratchet.`,
+    );
+  }
+
+  const file = writeBaseline(cwd, toBaseline(measurements));
+  const shown = file.replace(`${cwd}${sep}`, '');
+  process.stdout.write(`\nwrote ${shown}\n`);
 }
 
 function renderProjectProfile({ id, stacks, conformance, foundationVersion }) {
@@ -303,6 +357,8 @@ function main() {
         return cmdHealth(rest, cwd);
       case 'render':
         return cmdRender(rest, cwd);
+      case 'baseline':
+        return cmdBaseline(rest, cwd);
       case 'init':
         return cmdInit(rest, cwd);
       case undefined:
