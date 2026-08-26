@@ -37,6 +37,16 @@ export function resolveFoundationDir({ cwd, version, explicitPath, cacheDir } = 
     if (existsSync(join(dir, 'rules'))) return { dir, strategy: 'workspace', attempts };
   }
 
+  // ADR-0008. An installed package is pinned by the consumer's manifest, which
+  // is a stronger claim about which version applies than a shared user-level
+  // cache that may hold anything. It therefore outranks the cache and loses to
+  // the workspace, so self-hosting still wins.
+  if (cwd) {
+    const dir = join(cwd, 'node_modules', 'aief', 'foundation');
+    attempts.push({ strategy: 'installed', dir });
+    if (existsSync(join(dir, 'rules'))) return { dir, strategy: 'installed', attempts };
+  }
+
   if (version) {
     const base = cacheDir ?? join(homedir(), '.aief', 'foundation');
     const dir = join(base, version);
@@ -48,7 +58,8 @@ export function resolveFoundationDir({ cwd, version, explicitPath, cacheDir } = 
   throw new ArtifactError(
     'foundation',
     `version "${version ?? 'unspecified'}" could not be resolved offline. Tried:\n${tried}\n` +
-      `Populate the cache or pass --foundation <path>. Composition never fetches (ADR-0003).`,
+      `Install aief, populate the cache, or pass --foundation <path>. ` +
+      `Composition never fetches (ADR-0003).`,
   );
 }
 

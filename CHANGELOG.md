@@ -37,6 +37,9 @@ Notable changes to the AIEF repository.
 - A cached Foundation is a self-contained bundle: `rules/` and `stacks/` side by side under
   the version directory, so a consumer resolves both offline with no absolute path in any
   artifact.
+- Foundation resolution gained an `installed` strategy between `workspace` and `cache`, so a
+  project that installs the package runs `npx aief compose` with no flag and resolves the
+  version its manifest pins (ADR-0008).
 
 ### Removed
 
@@ -67,6 +70,7 @@ Notable changes to the AIEF repository.
 - ADR-0005 tool-bound intents default to advisory.
 - ADR-0006 the engine may execute Stack Profile commands, under one verb only.
 - ADR-0007 a provider distribution manifest may live at the repository root.
+- ADR-0008 an installed package is a Foundation resolution strategy.
 
 ### Known gaps
 
