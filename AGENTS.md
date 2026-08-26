@@ -34,6 +34,7 @@ Conformance declared in `.ai/project.yaml`: **core**.
 | Stack bindings                         | `stacks/<stack>/`                                             |
 | Provider projection contracts          | `providers/<provider>/`                                       |
 | Templates rendered into other projects | `templates/`                                                  |
+| Claude Code plugin (a projection)      | `plugins/aief/`; manifest at the root, ADR-0007               |
 | This repository's own parameters       | `.ai/project.yaml`, `.ai/waivers/`                            |
 | Implementation specs                   | `docs/specs/`                                                 |
 | Architecture decisions                 | `docs/adr/`                                                   |

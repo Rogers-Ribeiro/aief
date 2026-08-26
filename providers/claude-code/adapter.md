@@ -18,6 +18,16 @@ foundation/rules/*.yaml       rule intents, modes and enforcement categories
 provider consumes. That region is verified against the composition by `aief render --check`
 and by health checks H9 and L4 — drift is a build failure, not a discrepancy someone notices.
 
+The Claude Code plugin is built and installable (ADR-0007):
+
+```text
+/plugin marketplace add Rogers-Ribeiro/aief
+/plugin install aief@aief
+```
+
+It ships four skills and one command. It restates no rule — `aief compose` remains the only
+thing that says what applies, and a rule living only here would be the §6 defect.
+
 Every other file in the table below is still **contract only**: documented, not generated. A
 table row is a claim about what the adapter does; these rows describe what it will do.
 

@@ -23,6 +23,9 @@ Notable changes to the AIEF repository.
   violation identities for lint.
 - Provider adapter contracts for Claude Code and Codex.
 - 86 tests, including dogfooding: this repository composes, audits and ratchets itself.
+- **Claude Code plugin** — installable through the plugin marketplace, shipping the spec, plan,
+  ADR and configuration-audit procedures as skills plus one `/aief:status` command. It is a
+  projection and carries no rules.
 
 ### Changed
 
@@ -41,6 +44,8 @@ Notable changes to the AIEF repository.
   dispensed nothing, and a waiver that changes no outcome is decorative governance.
 - `templates/project/project.yaml.tmpl`, which described a Project Profile shape that
   disagreed with the one `aief init` generates.
+- `templates/skills/`, moved into the Claude Code plugin. Four SKILL.md files nothing read is
+  the orphan artifact §29 prohibits; shipped, they have a consumer.
 
 ### Fixed
 
@@ -61,6 +66,7 @@ Notable changes to the AIEF repository.
 - ADR-0004 JSON Schema as the published governance contract.
 - ADR-0005 tool-bound intents default to advisory.
 - ADR-0006 the engine may execute Stack Profile commands, under one verb only.
+- ADR-0007 a provider distribution manifest may live at the repository root.
 
 ### Known gaps
 

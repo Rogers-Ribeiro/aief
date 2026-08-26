@@ -1,0 +1,11 @@
+{
+  "name": "aief",
+  "displayName": "AI Engineering Foundation",
+  "description": "Claude Code projection of AIEF. Ships the repeated procedures as skills and reports the composed configuration. Contains no engineering rules — those live in the Foundation, and a rule that existed only here would be a defect.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Rogers Ribeiro"
+  },
+  "homepage": "https://github.com/Rogers-Ribeiro/aief",
+  "license": "MIT"
+}

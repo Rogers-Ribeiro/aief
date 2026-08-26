@@ -1,0 +1,14 @@
+{
+  "name": "aief",
+  "description": "AI Engineering Foundation — governance that composes, and checks its own claims",
+  "owner": {
+    "name": "Rogers Ribeiro"
+  },
+  "plugins": [
+    {
+      "name": "aief",
+      "source": "./plugins/aief",
+      "description": "Claude Code projection of the AI Engineering Foundation: the spec-to-verify procedures, and one command that reports what the composed configuration actually enforces"
+    }
+  ]
+}

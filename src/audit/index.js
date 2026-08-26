@@ -226,9 +226,10 @@ export function audit({ cwd, foundation, project, stacks = [], waivers = [], com
       'H8',
       'unused roles and skills',
       '§48',
-      'templates/roles/ and templates/skills/ hold starting points to copy, but nothing ' +
-        'links a role or a skill to a rule. Detection needs that link, not the file: without ' +
-        'it, "unused" can only mean "not mentioned anywhere", which every template is.',
+      'the Claude Code plugin ships four skills and templates/roles/ holds three role ' +
+        'descriptions, but nothing links a role or a skill to a rule or a workflow step. ' +
+        'Detection needs that link, not the file: without it, "unused" can only mean "not ' +
+        'referenced anywhere", which is true of every artifact meant to be invoked by a human.',
     ),
   );
 
