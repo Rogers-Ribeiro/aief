@@ -24,37 +24,39 @@ Conformance declared in `.ai/project.yaml`: **core**.
 
 ## Where things belong
 
-| Concern                                | Location                             |
-| -------------------------------------- | ------------------------------------ |
-| Normative policy                       | `foundation/AIEF-000-foundation.md`  |
-| Addressable rule intents               | `foundation/rules/*.yaml` (ADR-0002) |
-| Machine-readable contracts             | `schemas/*.json`                     |
-| Engine implementation                  | `src/{model,load,resolve,emit,cli}/` |
-| Repository-development utilities       | `scripts/`                           |
-| Stack bindings                         | `stacks/<stack>/`                    |
-| Provider projection contracts          | `providers/<provider>/`              |
-| Templates rendered into other projects | `templates/`                         |
-| This repository's own parameters       | `.ai/project.yaml`, `.ai/waivers/`   |
-| Implementation specs                   | `docs/specs/`                        |
-| Architecture decisions                 | `docs/adr/`                          |
+| Concern                                | Location                                   |
+| -------------------------------------- | ------------------------------------------ |
+| Normative policy                       | `foundation/AIEF-000-foundation.md`        |
+| Addressable rule intents               | `foundation/rules/*.yaml` (ADR-0002)       |
+| Machine-readable contracts             | `schemas/*.json`                           |
+| Engine implementation                  | `src/{model,load,resolve,audit,emit,cli}/` |
+| Repository-development utilities       | `scripts/`                                 |
+| Stack bindings                         | `stacks/<stack>/`                          |
+| Provider projection contracts          | `providers/<provider>/`                    |
+| Templates rendered into other projects | `templates/`                               |
+| This repository's own parameters       | `.ai/project.yaml`, `.ai/waivers/`         |
+| Implementation specs                   | `docs/specs/`                              |
+| Architecture decisions                 | `docs/adr/`                                |
 
 ## Commands
 
 ```text
 npm run verify        format + lint + parity + test + compose. Run before claiming done.
-npm test              45 tests
+npm test              62 tests
 npm run compose       resolve this repository's own configuration
+npm run health        §48 health checks and §55 layer-boundary tests, read-only
 npm run parity        ADR-0002: prose and rule sidecar must agree
 node src/cli/index.js compose --verbose    per-rule modes, bindings and provenance
 ```
 
 ## Module boundaries
 
-Dependencies point one way. `cli → emit → resolve → load → model`. Nothing depends on `cli/`.
+Dependencies point one way. `cli → {audit, emit} → resolve → load → model`. Nothing depends
+on `cli/`.
 
-`resolve/` composes. It does not audit — health checks, contamination tests and baseline
-comparison are AIEF-002 and AIEF-003, and merging them into composition makes both
-harder to test.
+`resolve/` composes. It does not audit. `audit/` reads a composition and judges it, and never
+writes: a checker that repairs what it finds cannot be trusted to report honestly. Baseline
+comparison is neither, and belongs to AIEF-003.
 
 ## Traps specific to this repository
 
@@ -77,10 +79,14 @@ ADR-0003. That is why self-hosting needs no bootstrap special case.
 
 ## Current target
 
-`AIEF-001 — Init & Composition Engine`. Tasks and status in
-`docs/specs/aief-001-init-composition-engine/tasks.md`.
+`AIEF-002 — Configuration health check & layer-boundary tests` is delivered;
+`AIEF-001` remains open on task 17, the provider projection generator, which is also what
+blocks health checks H9 and L4.
 
-Do not build provider adapters or stack profiles beyond what AIEF-001 requires.
+Status in `docs/specs/aief-001-init-composition-engine/tasks.md` and
+`docs/specs/aief-002-health-check/tasks.md`.
+
+Do not build provider adapters or stack profiles beyond what the open work item requires.
 
 ## Definition of Done
 

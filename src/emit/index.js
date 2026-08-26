@@ -108,3 +108,34 @@ export function renderReport(result, { verbose = false } = {}) {
 
   return lines.join('\n');
 }
+
+const STATUS_MARK = { pass: 'ok  ', fail: 'FAIL', warn: 'warn', not_implemented: '--  ' };
+
+/**
+ * Renders an audit() result. `not_implemented` prints as loudly as a pass so a
+ * reader cannot mistake a declared gap for a satisfied check (§48, AIEF-002).
+ */
+export function renderHealthReport(report, { verbose = false } = {}) {
+  const lines = [];
+  const c = report.counts;
+  lines.push(
+    `${c.pass} pass  ·  ${c.fail} fail  ·  ${c.warn} warn  ·  ` +
+      `${c.not_implemented} not implemented`,
+  );
+  lines.push('');
+
+  for (const chk of report.checks) {
+    lines.push(
+      `  ${STATUS_MARK[chk.status]} ${chk.id.padEnd(4)} ${chk.title.padEnd(46)} ` +
+        `${chk.section.padEnd(7)} ${chk.detail}`,
+    );
+    const show = chk.status === 'fail' || chk.status === 'warn' || verbose;
+    if (show) for (const f of chk.findings) lines.push(`         ${f}`);
+  }
+
+  if (c.fail) {
+    lines.push('');
+    lines.push(`${c.fail} health check(s) failed.`);
+  }
+  return lines.join('\n');
+}

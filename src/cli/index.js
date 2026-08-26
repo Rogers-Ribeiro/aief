@@ -16,13 +16,23 @@ import {
 } from '../load/index.js';
 import { ArtifactError } from '../load/yaml.js';
 import { compose } from '../resolve/index.js';
-import { renderReport, writeEffectiveConfig, EFFECTIVE_CONFIG_PATH } from '../emit/index.js';
+import { audit } from '../audit/index.js';
+import {
+  renderReport,
+  renderHealthReport,
+  writeEffectiveConfig,
+  EFFECTIVE_CONFIG_PATH,
+} from '../emit/index.js';
 
 const USAGE = `aief — AI Engineering Foundation
 
   aief compose [--write] [--verbose] [--foundation <path>]
       Resolve Foundation + Stack Profile(s) + Project Profile + Waivers.
       Exits non-zero on any governance failure.
+
+  aief health [--verbose] [--foundation <path>]
+      Audit the governance configuration: §48 health checks and §55
+      layer-boundary tests. Read-only. Exits non-zero on any failed check.
 
   aief init --id <project-id> [--stack <name>]... [--conformance core|full] [--yes]
       Bootstrap a repository onto a referenced Foundation version.
@@ -92,6 +102,27 @@ function cmdCompose(argv, cwd) {
   }
 
   process.exit(result.ok ? 0 : 1);
+}
+
+function cmdHealth(argv, cwd) {
+  const { values } = parseArgs({
+    args: argv,
+    options: {
+      verbose: { type: 'boolean', short: 'v', default: false },
+      foundation: { type: 'string' },
+    },
+    allowPositionals: false,
+  });
+
+  const { project, foundation, stacks, waivers } = loadAll(cwd, {
+    foundationPath: values.foundation,
+  });
+  const composition = compose({ foundation, project, stacks, waivers });
+  const report = audit({ cwd, foundation, project, stacks, waivers, composition });
+
+  process.stdout.write(`${renderHealthReport(report, { verbose: values.verbose })}
+`);
+  process.exit(report.ok ? 0 : 1);
 }
 
 function renderProjectProfile({ id, stacks, conformance, foundationVersion }) {
@@ -190,6 +221,8 @@ function main() {
     switch (command) {
       case 'compose':
         return cmdCompose(rest, cwd);
+      case 'health':
+        return cmdHealth(rest, cwd);
       case 'init':
         return cmdInit(rest, cwd);
       case undefined:

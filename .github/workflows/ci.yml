@@ -37,6 +37,9 @@ jobs:
       - name: compose (dogfooding — AC14)
         run: npm run compose
 
+      - name: health (AIEF-002 — §48 health checks and §55 layer boundaries)
+        run: npm run health
+
   parity:
     # ADR-0002 — the prose specification and the rule sidecar must agree.
     # A rule that exists in one and not the other is a Foundation defect.

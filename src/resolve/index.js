@@ -30,11 +30,19 @@ const ENGINE_ENFORCED = new Map([
 /** Categories that only a reader can judge. Enforcing these is a modelling error. */
 const JUDGEMENT_ONLY = new Set(['review', 'documentation']);
 
-/** Full-conformance requirements this engine version cannot yet satisfy. */
+/**
+ * Full-conformance requirements this engine version cannot yet satisfy.
+ *
+ * Named per missing detection rather than per requirement. "AIEF-002" as a
+ * reason tells the reader to wait; naming H4, H8, H9, H10 and L4 tells them
+ * what is actually absent and lets them judge whether it matters to them.
+ */
 const UNIMPLEMENTED_FULL = {
-  F5: 'configuration health check — AIEF-002',
-  F6: 'layer-boundary tests — AIEF-002',
-  F7: 'mechanical baseline monotonicity — AIEF-003',
+  F5:
+    'configuration health check (§48) — H4 stale rules, H8 unused roles and skills, ' +
+    'H9 provider projection drift and H10 Stack Profile binding drift are not implemented',
+  F6: 'layer-boundary tests (§55) — L4 provider truth drift is not implemented',
+  F7: 'mechanical baseline monotonicity (§46) — AIEF-003',
 };
 
 const LAYER_ORDER = { foundation: 0, stack: 1, project: 2 };
