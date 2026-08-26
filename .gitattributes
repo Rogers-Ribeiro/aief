@@ -1,7 +1,12 @@
-* text=auto
-*.md text eol=lf
-*.json text eol=lf
-*.yaml text eol=lf
-*.yml text eol=lf
-*.sh text eol=lf
+# One rule instead of a list of extensions.
+#
+# The previous version pinned .md, .json, .yaml, .yml and .sh to LF and left
+# .js to `text=auto`, which checks out CRLF on Windows. Prettier assumes LF, so
+# every JavaScript file failed `format:check` on the Windows runner and nowhere
+# else — a defect invisible to a working tree that was already normalized.
+#
+# Enumerating extensions means the next new one is wrong by default.
+* text=auto eol=lf
+
+# PowerShell is the one deliberate exception: some hosts still require CRLF.
 *.ps1 text eol=crlf
