@@ -49,6 +49,9 @@ Notable changes to the AIEF repository.
   in ADR-0005; regression covered by `test/init.test.js`.
 - The §55.1 contamination scan reported a cached bundle's own Stack Profiles as Foundation
   contamination.
+- `.gitattributes` left `.js` to `text=auto`, so a Windows checkout produced CRLF and
+  `prettier --check` rejected every JavaScript file on windows-latest. Found by the
+  three-platform matrix on its first execution.
 
 ### Decided
 
@@ -63,7 +66,6 @@ Notable changes to the AIEF repository.
 
 - `conformance: full` is refused. F5 is the only requirement still refusing it: H4 stale
   rules, H8 unused roles and skills, H10 Stack Profile binding drift.
-- Three-platform CI has never executed; verified on Windows only.
 - Secret scanning is unbound, so `AIEF-SEC-001` is advisory. Binding it means choosing a
   scanner — a dependency decision carrying a supply-chain flag, and its own ADR.
 - `aief adopt` — repository inventory and convention extraction (§45) — is AIEF-004.

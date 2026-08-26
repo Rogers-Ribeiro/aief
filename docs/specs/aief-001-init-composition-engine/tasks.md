@@ -46,20 +46,20 @@ no dependency added beyond the YAML parser without its own recorded decision
 
 ## Status — 2026-08-26
 
-| Task                          | State       | Evidence                                                          |
-| ----------------------------- | ----------- | ----------------------------------------------------------------- |
-| 0 Verify runtime premise      | done        | `node v24.13.0`, `codex-cli 0.148.0`; recorded in ADR-0001        |
-| 1 Repository skeleton         | done        | `npm run verify` exit 0 locally; CI workflow written              |
-| 2 `model/`                    | done        | 13 schema tests                                                   |
-| 3 ADR-0002 + sidecar + parity | done        | `parity ok — 63 rules`; the check found 4 real gaps on first run  |
-| 4 ADR-0003 + `load/`          | done        | resolves via `workspace`, no network                              |
-| 5–10 `resolve/`               | done        | 16 resolver tests                                                 |
-| 11–12 `emit/`                 | done        | 7 emit tests, determinism included                                |
-| 13 `cli compose`              | done        | `npm run compose`                                                 |
-| 14–15 `cli init`              | done        | 4 end-to-end tests in a temporary directory (`test/init.test.js`) |
-| 16 Stack Profile `node`       | done        | binds format, lint, test, dependency_audit and raises those rules |
-| 17 Provider projection        | done        | `aief render` + drift detection; 7 projection tests               |
-| 18 Dogfooding                 | **partial** | composes locally and in a second project; CI matrix never ran     |
+| Task                          | State | Evidence                                                          |
+| ----------------------------- | ----- | ----------------------------------------------------------------- |
+| 0 Verify runtime premise      | done  | `node v24.13.0`, `codex-cli 0.148.0`; recorded in ADR-0001        |
+| 1 Repository skeleton         | done  | `npm run verify` exit 0 locally; CI workflow written              |
+| 2 `model/`                    | done  | 13 schema tests                                                   |
+| 3 ADR-0002 + sidecar + parity | done  | `parity ok — 63 rules`; the check found 4 real gaps on first run  |
+| 4 ADR-0003 + `load/`          | done  | resolves via `workspace`, no network                              |
+| 5–10 `resolve/`               | done  | 16 resolver tests                                                 |
+| 11–12 `emit/`                 | done  | 7 emit tests, determinism included                                |
+| 13 `cli compose`              | done  | `npm run compose`                                                 |
+| 14–15 `cli init`              | done  | 4 end-to-end tests in a temporary directory (`test/init.test.js`) |
+| 16 Stack Profile `node`       | done  | binds format, lint, test, dependency_audit and raises those rules |
+| 17 Provider projection        | done  | `aief render` + drift detection; 7 projection tests               |
+| 18 Dogfooding                 | done  | green on ubuntu, macos and windows; run 32964986377               |
 
 ### Defect found and fixed after the first status entry
 
@@ -86,7 +86,26 @@ excludes those bundled profiles instead of reporting every binding command in th
 A third materially different project is still missing, and a stackless project is a weak test
 of stack binding. The next one should bring a stack that is not node.
 
+### AC13 — verified 2026-08-26
+
+```text
+✓ verify (ubuntu-latest)    16s
+✓ verify (macos-latest)     17s
+✓ verify (windows-latest)   46s
+✓ parity                    13s
+```
+
+The first run failed, and the failure is the point. `.gitattributes` pinned `.md`, `.json`,
+`.yaml`, `.yml` and `.sh` to LF but left `.js` to `text=auto`, so a Windows checkout produced
+CRLF and `prettier --check` rejected every JavaScript file — on windows-latest only.
+
+It was invisible to local verification because a working tree that has been through
+`prettier --write` already holds LF; only a clean checkout differs. "Verified on Windows"
+had been true and insufficient at the same time, which is the failure mode a single-platform
+run cannot report about itself.
+
 ### Not verified
 
-- **AC13 (three platforms).** The CI matrix exists but has not executed — there is no remote. Verified on Windows only.
 - **AC4 interactive confirmation.** Implemented as an explicit `--yes` flag rather than a TTY prompt, which is what makes it testable. A real prompt is untested.
+- **Node 20 deprecation.** All three jobs annotate that `actions/checkout@v4` and
+  `actions/setup-node@v4` still target Node 20. A warning today; a failure eventually.
